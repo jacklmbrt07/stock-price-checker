@@ -40,6 +40,8 @@ module.exports = function (app) {
           } else if (!err && stockDocument) {
             if (twoStocks === false) {
               return nextStep(stockDocument, processOneStock);
+            } else {
+              return nextStep(stockDocument, processTwoStocks);
             }
           }
         }
@@ -83,7 +85,22 @@ module.exports = function (app) {
 
     let stocks = [];
 
-    let processTwoStocks = (stockDocument, nextStep) => {};
+    let processTwoStocks = (stockDocument, nextStep) => {
+      let newStock = {
+        stock: stockDocument.name,
+        price: stockDocument.price,
+        likes: stockDocument.likes,
+      };
+      stocks.push(newStock);
+      if (stocks.length === 2) {
+        stocks[0]["rel_likes"] = stocks[0]["likes"] - stocks[1]["likes"];
+        stocks[1]["rel_likes"] = stocks[1]["likes"] - stocks[0]["likes"];
+        responseObject["stockData"] = stocks;
+        nextStep();
+      } else {
+        return;
+      }
+    };
 
     if (typeof req.query.stock === "string") {
       let stockName = req.query.stock;
@@ -97,6 +114,22 @@ module.exports = function (app) {
       }
     } else if (Array.isArray(req.query.stock)) {
       twoStocks = true;
+      /* Stock 1 */
+      let stockName = req.query.stock[0];
+      if (req.query.like && req.query.like === "true") {
+        likeStock(stockName, findOrUpdateStock);
+      } else {
+        let documentUpdate = {};
+        findOrUpdateStock(stockName, documentUpdate, getPrice);
+      }
+      /* Stock 2 */
+      stockName = req.query.stock[1];
+      if (req.query.like && req.query.like === "true") {
+        likeStock(stockName, findOrUpdateStock);
+      } else {
+        let documentUpdate = {};
+        findOrUpdateStock(stockName, documentUpdate, getPrice);
+      }
     }
   });
 };
