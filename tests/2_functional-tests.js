@@ -19,6 +19,7 @@ suite("Functional Tests", function () {
       });
   });
 
+  // 'AAPL' stock must be deleted from MongoDB before test is run in order for these to pass
   test("1 stock with like", (done) => {
     chai
       .request(server)
@@ -37,8 +38,7 @@ suite("Functional Tests", function () {
       .get("/api/stock-prices")
       .query({ stock: "aapl", like: true })
       .end((err, res) => {
-        console.log(res.body);
-        assert.equal(res.body, "Error: Only 1 Like per IP Allowed");
+        assert.equal(res.text, "Error: Only 1 Like per IP Allowed");
         done();
       });
   });
