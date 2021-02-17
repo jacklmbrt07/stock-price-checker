@@ -18,4 +18,28 @@ suite("Functional Tests", function () {
         done();
       });
   });
+
+  test("1 stock with like", (done) => {
+    chai
+      .request(server)
+      .get("/api/stock-prices")
+      .query({ stock: "aapl", like: true })
+      .end((err, res) => {
+        assert.equal(res.body["stockData"]["stock"], "aapl");
+        assert.equal(res.body["stockData"]["likes"], 1);
+        done();
+      });
+  });
+
+  test("Ensure likes are not counted twice", (done) => {
+    chai
+      .request(server)
+      .get("/api/stock-prices")
+      .query({ stock: "aapl", like: true })
+      .end((err, res) => {
+        console.log(res.body);
+        assert.equal(res.body, "Error: Only 1 Like per IP Allowed");
+        done();
+      });
+  });
 });

@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 module.exports = function (app) {
-  mongoose.connect(process.env.MONGO_URI, {
+  mongoose.connect(process.env.DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
