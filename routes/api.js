@@ -2,6 +2,7 @@
 
 const mongodb = require("mongodb");
 const mongoose = require("mongoose");
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest
 
 module.exports = function (app) {
   mongoose.connect(process.env.MONGO_URI, {
@@ -48,11 +49,21 @@ module.exports = function (app) {
     let likeStock = (stockName, nextStep) => {};
 
     let getPrice = (stockDocument, nextStep) => {
-      nextStep(stockDocument, outputResponse);
+      let xhr = new XMLHttpRequest()
+      let requestUrl = `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${stockDocument.name}/quote`
+      xhr.open('GET', requestUrl, true)
+      xhr.onload = () => {
+        let apiResponse = JSON.parse(xhr.responseText)
+        stockDocument.price = apiResponse.latestPrice.toFixed(2)
+        nextStep(stockDocument, outputResponse);
+      }
+      xhr.send()
     };
 
     let processOneStock = (stockDocument, nextStep) => {
       responseObject["stockData"]["stock"] = stockDocument["name"];
+      responseObject["stockData"]["price"] = stockDocument["price"];
+      responseObject["stockData"]["likes"] = stockDocument["likes"];
       nextStep();
     };
 
