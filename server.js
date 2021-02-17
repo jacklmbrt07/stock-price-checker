@@ -45,6 +45,9 @@ app.use(
   })
 );
 
+//trust proxy property. 1 like per IP
+app.enable('trust proxy')
+
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {
   console.log("Listening on port " + process.env.PORT);

@@ -2,13 +2,13 @@
 
 const mongodb = require("mongodb");
 const mongoose = require("mongoose");
-const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 module.exports = function (app) {
   mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: false
+    useFindAndModify: false,
   });
 
   let stockSchema = new mongoose.Schema({
@@ -46,18 +46,32 @@ module.exports = function (app) {
       );
     };
 
-    let likeStock = (stockName, nextStep) => {};
+    let likeStock = (stockName, nextStep) => {
+      Stock.findOne({ name: stockName }, (err, stockDocument) => {
+        if (
+          !err &&
+          stockDocument &&
+          stockDocument.ips &&
+          stockDocument.ips.includes(req.ip)
+        ) {
+          return res.send("Error: Only 1 Like per IP Allowed");
+        } else {
+          let documentUpdate = { $inc: { likes: 1 }, $push: { ips: req.ip } };
+          nextStep(stockName, documentUpdate, getPrice);
+        }
+      });
+    };
 
     let getPrice = (stockDocument, nextStep) => {
-      let xhr = new XMLHttpRequest()
-      let requestUrl = `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${stockDocument.name}/quote`
-      xhr.open('GET', requestUrl, true)
+      let xhr = new XMLHttpRequest();
+      let requestUrl = `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${stockDocument.name}/quote`;
+      xhr.open("GET", requestUrl, true);
       xhr.onload = () => {
-        let apiResponse = JSON.parse(xhr.responseText)
-        stockDocument.price = apiResponse.latestPrice.toFixed(2)
+        let apiResponse = JSON.parse(xhr.responseText);
+        stockDocument.price = apiResponse.latestPrice.toFixed(2);
         nextStep(stockDocument, outputResponse);
-      }
-      xhr.send()
+      };
+      xhr.send();
     };
 
     let processOneStock = (stockDocument, nextStep) => {
@@ -75,7 +89,12 @@ module.exports = function (app) {
       let stockName = req.query.stock;
 
       let documentUpdate = {};
-      findOrUpdateStock(stockName, documentUpdate, getPrice);
+      if (req.query.like && req.query.like === "true") {
+        likeStock(stockName, findOrUpdateStock);
+      } else {
+        let documentUpdate = {};
+        findOrUpdateStock(stockName, documentUpdate, getPrice);
+      }
     } else if (Array.isArray(req.query.stock)) {
       twoStocks = true;
     }
