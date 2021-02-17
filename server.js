@@ -10,6 +10,8 @@ const runner = require("./test-runner");
 
 const app = express();
 
+const helmet = require("helmet");
+
 app.use("/public", express.static(process.cwd() + "/public"));
 
 app.use(cors({ origin: "*" })); //For FCC testing purposes only
@@ -32,6 +34,16 @@ apiRoutes(app);
 app.use(function (req, res, next) {
   res.status(404).type("text").send("Not Found");
 });
+
+//Helmet security for middleware
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+    },
+  })
+);
 
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {
