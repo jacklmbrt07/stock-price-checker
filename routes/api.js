@@ -29,7 +29,7 @@ module.exports = function (app) {
       return res.json(responseObject);
     };
 
-    let findOrUpdateStock = (stockName, documentUpdate, nextStep) => {
+    const findOrUpdateStock = (stockName, documentUpdate, nextStep) => {
       Stock.findOneAndUpdate(
         { name: stockName },
         documentUpdate,
@@ -48,7 +48,7 @@ module.exports = function (app) {
       );
     };
 
-    let likeStock = (stockName, nextStep) => {
+    const likeStock = (stockName, nextStep) => {
       Stock.findOne({ name: stockName }, (err, stockDocument) => {
         if (
           !err &&
@@ -64,7 +64,7 @@ module.exports = function (app) {
       });
     };
 
-    let getPrice = (stockDocument, nextStep) => {
+    const getPrice = (stockDocument, nextStep) => {
       let xhr = new XMLHttpRequest();
       let requestUrl = `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${stockDocument.name}/quote`;
       xhr.open("GET", requestUrl, true);
@@ -76,7 +76,7 @@ module.exports = function (app) {
       xhr.send();
     };
 
-    let processOneStock = (stockDocument, nextStep) => {
+    const processOneStock = (stockDocument, nextStep) => {
       responseObject["stockData"]["stock"] = stockDocument["name"];
       responseObject["stockData"]["price"] = stockDocument["price"];
       responseObject["stockData"]["likes"] = stockDocument["likes"];
@@ -85,7 +85,7 @@ module.exports = function (app) {
 
     let stocks = [];
 
-    let processTwoStocks = (stockDocument, nextStep) => {
+    const processTwoStocks = (stockDocument, nextStep) => {
       let newStock = {
         stock: stockDocument.name,
         price: stockDocument.price,
