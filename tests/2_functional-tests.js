@@ -75,7 +75,7 @@ suite("Functional Tests", function () {
     chai
       .request(server)
       .get("/api/stock-prices")
-      .query({ stock: ["spot", "amazon"], like: true })
+      .query({ stock: ["spot", "amzn"], like: true })
       .end((err, res) => {
         let stockData = res.body.stockData;
         if (stockData[0]["stock"] === "spot") {
