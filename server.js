@@ -19,6 +19,19 @@ app.use(cors({ origin: "*" })); //For FCC testing purposes only
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//Helmet security for middleware
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+    },
+  })
+);
+
+//trust proxy property. 1 like per IP
+app.enable('trust proxy')
+
 //Index page (static HTML)
 app.route("/").get(function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
@@ -34,19 +47,6 @@ apiRoutes(app);
 app.use(function (req, res, next) {
   res.status(404).type("text").send("Not Found");
 });
-
-//Helmet security for middleware
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-    },
-  })
-);
-
-//trust proxy property. 1 like per IP
-app.enable('trust proxy')
 
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {

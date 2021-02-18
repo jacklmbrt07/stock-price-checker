@@ -12,6 +12,9 @@ suite("Functional Tests", function () {
       .get("/api/stock-prices")
       .query({ stock: "GOOG" })
       .end((err, res) => {
+        assert.typeOf(res.body['stockData']['stock'], 'string', 'stock is a string')
+        assert.typeOf(res.body['stockData']['price'], 'number', 'price is a number')
+        assert.typeOf(res.body['stockData']['likes'], 'number', 'likes is a number')
         assert.equal(res.body["stockData"]["stock"], "GOOG");
         assert.isNotNull(res.body["stockData"]["price"]);
         assert.isNotNull(res.body["stockData"]["likes"]);
@@ -75,7 +78,7 @@ suite("Functional Tests", function () {
     chai
       .request(server)
       .get("/api/stock-prices")
-      .query({ stock: ["spot", "amazon"], like: true })
+      .query({ stock: ["spot", "amzn"], like: true })
       .end((err, res) => {
         let stockData = res.body.stockData;
         if (stockData[0]["stock"] === "spot") {

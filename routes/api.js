@@ -70,7 +70,7 @@ module.exports = function (app) {
       xhr.open("GET", requestUrl, true);
       xhr.onload = () => {
         let apiResponse = JSON.parse(xhr.responseText);
-        stockDocument.price = apiResponse.latestPrice.toFixed(2);
+        stockDocument.price = apiResponse.latestPrice;
         nextStep(stockDocument, outputResponse);
       };
       xhr.send();
