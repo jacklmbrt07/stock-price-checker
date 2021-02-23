@@ -30,11 +30,7 @@ app.use(
 );
 
 //trust proxy property. 1 like per IP
-<<<<<<< HEAD
 app.enable("trust proxy");
-=======
-app.enable('trust proxy')
->>>>>>> ee75c44df03a9fcc911a6e930d6f2d6e72cff4fd
 
 //Index page (static HTML)
 app.route("/").get(function (req, res) {
